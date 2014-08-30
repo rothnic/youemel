@@ -20,7 +20,8 @@ function [ cls_str, rel_str ] = dotStringFromClass( meta_class )
 % EXAMPLES:
 %
 % SEE ALSO: youemel
-% 
+% http://www.lornajane.net/posts/2011/uml-diagrams-with-graphviz
+%
 % Author:       nick roth
 % email:        nick.roth@nou-systems.com
 % Matlab ver.:  8.3.0.532 (R2014a)
@@ -34,7 +35,7 @@ meths = meta_class.MethodList;
 parents = meta_class.SuperclassList;
 
 cls_name = meta_class.Name;
-newLine = '\l';
+newLine = '\\l';
 
 % Create header with class name, start of label definition, class name at
 % the top of the box and the initial horizontal divider
@@ -98,7 +99,7 @@ par_relations = {};
 for i = 1:length(parents)
     this_par = parents(i);
     
-    this_str = strcat(cls_name, ' ->', [' ', this_par.Name], '[dir=back]');
+    this_str = strcat(cls_name, ' ->', [' ', this_par.Name]);
     
     par_meta = meta.class.fromName(this_par.Name);
     [par_cls, par_rel] = dotStringFromClass(par_meta);

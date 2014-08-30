@@ -47,17 +47,13 @@ p.parse(root_path, varargin{:});
 root_path = p.Results.root_path;
 paths = rdir([root_path, '\**']);
 %% Primary function logic begins here
-%     cls_fields = {'Name','Description','DetailedDescription','Hidden',...
-%         'Sealed','Abstract','Enumeration','ConstructOnLoad',...
-%         'HandleCompatible','InferiorClasses','ContainingPackage',...
-%         'PropertyList','MethodList','EventList','EnumerationMemberList',...
-%         'SuperclassList'};
-%     init_vals = {' ', ' ', ' ', 0, 0, 0, 0, 0, 0, ' ', ' ', ' ', ' ', ' ', ...
-%         ' ', ' '};
-%     classes = initTable(init_vals, cls_fields);
 
-classes = {};
-idx = 1;
+header = getUmlDotHeader( 'none' );
+footer = '}';
+
+all_cls_str = {};
+all_rel_str = {};
+
 for i = 1:length(paths)
     files = what(paths(i).name);
     files = files.m;
@@ -67,10 +63,22 @@ for i = 1:length(paths)
         
         mclass = meta.class.fromName(files{j});
         if ~isempty(mclass)
-            classes{idx} = mclass;
-            idx = idx + 1;
+            [ cls_str, rel_str ] = dotStringFromClass( mclass );
+            all_cls_str = horzcat(all_cls_str, cls_str);
+            all_rel_str = horzcat(all_rel_str, rel_str);
         end
     end
 end
 
+all_cls_str = unique(all_cls_str);
+all_rel_str = unique(all_rel_str);
+dot_str = horzcat(header, all_cls_str, all_rel_str, footer);
+
+fileid = fopen('dotfile.dot', 'w');
+for i = 1:length(dot_str)
+    
+    fprintf(fileid, strcat(dot_str{i}, '\n'));
+end
+
+fclose(fileid);
 end
