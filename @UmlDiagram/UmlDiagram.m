@@ -32,7 +32,7 @@ classdef UmlDiagram < handle
         shape = 'record'
         footer = '}'
         splines = 'ortho'
-        dpi = 300
+        dpi = 150
         
         header
         classes = {}
@@ -56,7 +56,7 @@ classdef UmlDiagram < handle
             
             import UmlTools.*
             
-            self.paths = rdir([root_path, '\**']);
+            self.paths = rdir([root_path, '\**\*.m']);
             self.add_defaults();
             self.load_classes();
             self.load_relations();
@@ -93,25 +93,24 @@ classdef UmlDiagram < handle
             %cell array of Uml Class objects
             
             import UmlTools.*
+            the_paths = {self.paths.name};
+            dirs = cellfun(@fileparts, the_paths, 'UniformOutput', false);
+            cont = cellfun(@what, dirs);
+            mfiles = vertcat(cont.m);
+            mfiles = unique(mfiles);
             
-            % loop over each path searched and get m files within it
-            for i = 1:length(self.paths)
-                
-                files = what(self.paths(i).name);
-                files = files.m;
-                files = strrep(files, '.m', '');
-                
-                % loop over each m-file that exists in the path searched
-                for j = 1:length(files)
-                    
-                    % add to classes if it is a valid class
-                    mclass = meta.class.fromName(files{j});
-                    if ~isempty(mclass)
-                        self.classes = append_lines(self.classes, ...
-                            UmlClass(mclass.Name));
-                    end
+            % loop over each m-file that exists in the path searched
+            for i = 1:length(mfiles)
+                mfile = strrep(mfiles{i}, '.m', '');
+                % add to classes if it is a valid class
+                mclass = meta.class.fromName(mfile);
+                if ~isempty(mclass)
+                    self.classes = append_lines(self.classes, ...
+                        UmlClass(mclass.Name));
                 end
+                
             end
+            
         end
         
         function load_relations(self)
